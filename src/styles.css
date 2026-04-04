@@ -1,3 +1,37 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+
+@theme {
+  --color-wow-bg: #263238;
+  --color-wow-dark-brown: #361409;
+  --color-wow-gold: #ffd100;
+  --color-wow-orange: #fb8c00;
+  --color-wow-guild: #4caf50;
+  --color-wow-selected: #009688;
+  --color-alliance: #2196f3;
+  --color-horde: #f44336;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-wow-bg);
+  color: #fff;
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+}
+
+/* Faction text colors */
+.alliance {
+  color: var(--color-alliance);
+  font-weight: bold;
+}
+
+.horde {
+  color: var(--color-horde);
+  font-weight: bold;
+}

@@ -1,0 +1,78 @@
+.stats-container {
+  max-width: 540px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  width: 540px;
+  height: 85px;
+  background-image: url('/img/achievement_statistic_structure.png');
+  background-size: 540px 85px;
+  background-repeat: no-repeat;
+  opacity: 0.4;
+  transition: opacity 0.5s;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  opacity: 0.8;
+}
+
+.stat-card.completed {
+  opacity: 1;
+}
+
+.stat-card.completed:hover {
+  opacity: 1;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 12px 24px;
+  width: 100%;
+}
+
+.stat-name {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.stat-counter {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.progress-wrapper {
+  width: 370px;
+}
+
+.progress-track {
+  position: relative;
+  height: 24px;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #555, #2a1005);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #fb8c00, #7d5412);
+  transition: width 0.5s ease;
+}
+
+.progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 13px;
+  color: #ffd100;
+  text-shadow: 1px 1px 2px rgb(0 0 0 / 80%);
+}

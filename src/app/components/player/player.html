@@ -1,0 +1,125 @@
+<!-- Mobile sidebar toggle -->
+<div class="block md:hidden">
+  <button
+    class="navigation-toggle"
+    (click)="toggleSidebar()"
+    [attr.aria-expanded]="sidebarOpen()"
+    aria-controls="mobile-sidebar"
+    aria-label="Toggle category navigation"
+  >
+    @if (sidebarOpen()) {
+      &#9664;
+    } @else {
+      &#9654;
+    }
+  </button>
+</div>
+
+<!-- Mobile sidebar -->
+<nav
+  id="mobile-sidebar"
+  class="sidebar md:hidden"
+  [class.show]="sidebarOpen()"
+  aria-label="Achievement categories"
+>
+  <ng-container *ngTemplateOutlet="categoryNav" />
+</nav>
+
+<!-- Desktop layout -->
+<div class="mx-auto flex max-w-6xl gap-4 px-4 py-6">
+  <!-- Desktop sidebar -->
+  <nav class="hidden w-72 shrink-0 md:block" aria-label="Achievement categories">
+    <ng-container *ngTemplateOutlet="categoryNav" />
+  </nav>
+
+  <!-- Main content -->
+  <div class="min-w-0 flex-1">
+    @if (character(); as char) {
+      <div class="mb-6 flex items-center gap-4 rounded-lg bg-wow-dark-brown p-4">
+        <img
+          [src]="'/img/race/64/' + char.race + '-' + char.gender + '.png'"
+          [alt]="'Race ' + char.race"
+          width="64"
+          height="64"
+          class="rounded"
+        />
+        <img
+          [src]="'/img/class/64/' + char.class + '.png'"
+          [alt]="'Class ' + char.class"
+          width="64"
+          height="64"
+          class="rounded"
+        />
+        <div>
+          <h2 class="text-2xl font-bold" [class]="faction()">{{ char.name }}</h2>
+          <p class="text-gray-400">Level {{ char.level }}</p>
+          @if (char.guildName) {
+            <p class="text-wow-guild">&lt;{{ char.guildName }}&gt;</p>
+          }
+        </div>
+      </div>
+    }
+
+    <router-outlet />
+  </div>
+</div>
+
+<!-- Shared category navigation template -->
+<ng-template #categoryNav>
+  @for (parent of categoryTree(); track parent.id) {
+    <div class="mb-1">
+      <button
+        class="category w-full text-left"
+        [class.selected]="isParentExpanded(parent.id)"
+        (click)="toggleParent(parent.id)"
+        [attr.aria-expanded]="isParentExpanded(parent.id)"
+        [attr.aria-controls]="'children-' + parent.id"
+      >
+        {{ parent.name }}
+      </button>
+
+      @if (isParentExpanded(parent.id)) {
+        <div [id]="'children-' + parent.id" role="group" [attr.aria-label]="parent.name + ' subcategories'">
+          @for (child of parent.children; track child.id) {
+            @if (child.children.length > 0) {
+              <!-- Category with sub-children (e.g., Statistics) -->
+              <button
+                class="sub-category w-full text-left"
+                [class.statistic]="isStatCategory(child.id)"
+                [class.selected]="currentCategoryId() === child.id"
+                (click)="toggleStatistic(child.id)"
+                [attr.aria-expanded]="isStatisticExpanded(child.id)"
+              >
+                {{ child.name }}
+              </button>
+
+              @if (isStatisticExpanded(child.id)) {
+                <div role="group" [attr.aria-label]="child.name + ' subcategories'">
+                  @for (sub of child.children; track sub.id) {
+                    <button
+                      class="sub-statistic w-full text-left"
+                      [class.selected]="currentCategoryId() === sub.id"
+                      (click)="selectCategory(sub.id)"
+                    >
+                      {{ sub.name }}
+                    </button>
+                  }
+                </div>
+              }
+            } @else {
+              <!-- Leaf category -->
+              <button
+                class="sub-category w-full text-left"
+                [class.statistic]="isStatCategory(child.id)"
+                [class.selected]="currentCategoryId() === child.id"
+                (click)="selectCategory(child.id)"
+              >
+                {{ child.name }}
+              </button>
+            }
+          }
+        </div>
+      }
+    </div>
+  }
+</ng-template>
