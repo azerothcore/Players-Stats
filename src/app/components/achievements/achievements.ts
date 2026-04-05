@@ -15,31 +15,42 @@ import { PveApiService } from '../../services/pve-api.service';
 
 interface AchievementView extends Achievement {
   completed: boolean;
+  completedDate: Date | null;
 }
 
 @Component({
   selector: 'app-achievements',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [],
   template: `
     <div class="achievement-container mx-auto">
       @for (ach of achievements(); track ach.ID) {
-        <div class="achievement" [class.completed]="ach.completed" role="listitem">
-          <img
-            class="achievement-icon"
-            [src]="'https://wow.zamimg.com/images/wow/icons/large/' + ach.icon + '.jpg'"
-            [alt]="ach.Name + ' icon'"
-            width="50"
-            height="50"
-            loading="lazy"
-          />
-          <div class="achievement-content">
-            <span class="achievement-name">{{ ach.Name }}</span>
-            <span class="achievement-description">{{ ach.Description }}</span>
+        <a
+          [href]="'https://wowgaming.altervista.org/aowow/?achievement=' + ach.ID"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="achievement-link"
+        >
+          <div class="achievement" [class.completed]="ach.completed" role="listitem">
+            <img
+              class="achievement-icon"
+              [src]="'https://wow.zamimg.com/images/wow/icons/large/' + ach.icon + '.jpg'"
+              [alt]="ach.Name + ' icon'"
+              width="50"
+              height="50"
+              loading="lazy"
+            />
+            <div class="achievement-content">
+              <span class="achievement-name">{{ ach.Name }}</span>
+              <span class="achievement-description">{{ ach.Description }}</span>
+            </div>
+            <div class="achievement-right">
+              <span class="achievement-points" [class.achievement-points-0]="ach.Points === 0">{{
+                ach.Points
+              }}</span>
+            </div>
           </div>
-          <span class="achievement-points" [class.achievement-points-0]="ach.Points < 10">{{
-            ach.Points
-          }}</span>
-        </div>
+        </a>
       }
     </div>
   `,
@@ -68,15 +79,27 @@ export class Achievements implements OnInit {
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(({ characterAchs, allAchs }) => {
-        const completedIds = new Set(characterAchs.map((a) => a.achievement));
+        const completedMap = new Map(characterAchs.map((a) => [a.achievement, a.date]));
 
-        const views: AchievementView[] = allAchs.map((ach) => ({
-          ...ach,
-          icon: ach.icon === 'NULL' || !ach.icon ? 'trade_engineering' : ach.icon,
-          completed: completedIds.has(ach.ID),
-        }));
+        const views: AchievementView[] = allAchs.map((ach) => {
+          const dateTimestamp = completedMap.get(ach.ID);
+          return {
+            ...ach,
+            icon: ach.icon === 'NULL' || !ach.icon ? 'trade_engineering' : ach.icon,
+            completed: completedMap.has(ach.ID),
+            completedDate: dateTimestamp ? new Date(dateTimestamp * 1000) : null,
+          };
+        });
 
         this.achievements.set(views);
+
+        // Trigger wowgaming tooltip rescan for new achievement links
+        setTimeout(() => {
+          const wh = (window as unknown as Record<string, unknown>)['$WowheadPower'];
+          if (wh && typeof (wh as { refreshLinks?: () => void }).refreshLinks === 'function') {
+            (wh as { refreshLinks: () => void }).refreshLinks();
+          }
+        });
       });
   }
 }

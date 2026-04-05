@@ -3,14 +3,18 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-wow-bg: #263238;
+  --color-wow-bg: #0a0a0a;
   --color-wow-dark-brown: #361409;
-  --color-wow-gold: #ffd100;
+  --color-wow-gold: #bfa256;
+  --color-wow-gold-light: #d4b876;
   --color-wow-orange: #fb8c00;
   --color-wow-guild: #4caf50;
   --color-wow-selected: #009688;
-  --color-alliance: #2196f3;
-  --color-horde: #f44336;
+  --color-alliance: #1a67f4;
+  --color-horde: #cd0a0e;
+  --color-row-header: #ffffff22;
+  --color-row-even: #ffffff22;
+  --color-lighter-bg: rgba(255, 255, 255, 0.05);
 }
 
 html {
@@ -18,7 +22,7 @@ html {
 }
 
 body {
-  background-color: var(--color-wow-bg);
+  background-color: #0a0a0a;
   color: #fff;
   font-family: system-ui, -apple-system, sans-serif;
   min-height: 100vh;

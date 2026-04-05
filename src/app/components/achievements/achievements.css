@@ -2,6 +2,12 @@
   max-width: 540px;
 }
 
+.achievement-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 .achievement {
   display: flex;
   align-items: center;
@@ -62,16 +68,28 @@
   -webkit-box-orient: vertical;
 }
 
+.achievement-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 79px;
+  padding-bottom: 10px;
+}
+
 .achievement-points {
   font-weight: bold;
   font-size: 15px;
   text-align: center;
-  /* margin-left: auto; */
-  padding-right: 31px;
-  padding-bottom: 15px;
-  flex-shrink: 0;
 }
 
 .achievement-points-0 {
-  padding-right: 34px;
+  visibility: hidden;
+}
+
+.achievement-date {
+  font-size: 10px;
+  color: #aaa;
+  white-space: nowrap;
+  padding-right: 4px;
 }

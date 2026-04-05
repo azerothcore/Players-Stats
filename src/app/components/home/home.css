@@ -1,0 +1,14 @@
+.rank-row {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.rank-row:hover,
+.rank-row:focus-visible {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  outline: none;
+}
+
+.rank-row.row-even {
+  background-color: #ffffff22;
+}
