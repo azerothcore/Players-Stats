@@ -38,6 +38,8 @@ describe('Player', () => {
     mockApi = {
       getCharacter: vi.fn().mockReturnValue(of(mockCharacter)),
       getAchievementCategories: vi.fn().mockReturnValue(of(mockCategories)),
+      getAllCharacterAchievements: vi.fn().mockReturnValue(of([])),
+      getAllAchievements: vi.fn().mockReturnValue(of([])),
     };
 
     await TestBed.configureTestingModule({
@@ -80,7 +82,8 @@ describe('Player', () => {
       component.ngOnInit();
 
       const tree = component.categoryTree();
-      expect(tree.length).toBe(3);
+      expect(tree.length).toBe(4); // Summary + General, Quests, Statistics
+      expect(tree[0].name).toBe('Summary');
 
       const general = tree.find((n) => n.id === 92)!;
       expect(general.children.length).toBe(0);
@@ -102,11 +105,11 @@ describe('Player', () => {
       expect(stats.children[0].children[0].name).toBe('Kills');
     });
 
-    it('should auto-navigate to category 92', () => {
+    it('should auto-navigate to Summary', () => {
       component.ngOnInit();
 
-      expect(component.currentCategoryId()).toBe(92);
-      expect(router.navigate).toHaveBeenCalled();
+      expect(component.currentCategoryId()).toBe(-100);
+      expect(router.navigate).toHaveBeenCalledWith(['summary'], expect.any(Object));
     });
   });
 

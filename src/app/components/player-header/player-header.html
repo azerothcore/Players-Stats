@@ -19,5 +19,8 @@
     @if (char.guildName) {
       <span class="player-guild">&lt;{{ char.guildName }}&gt;</span>
     }
+    @if (achievementPoints(); as pts) {
+      <span class="player-points">{{ pts }}</span>
+    }
   </div>
 }

@@ -142,4 +142,36 @@ describe('PveApiService', () => {
       req.flush(mockProgress);
     });
   });
+
+  describe('getAllCharacterAchievements', () => {
+    it('should fetch all earned achievements for a character', () => {
+      const mockAchs = [{ achievement: 1, date: 1234567890 }];
+
+      service.getAllCharacterAchievements(5).subscribe((res) => {
+        expect(res).toEqual(mockAchs);
+      });
+
+      const req = httpMock.expectOne(`${baseUrl}character_achievement/5`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockAchs);
+    });
+  });
+
+  describe('getAllAchievements', () => {
+    it('should fetch all achievements without faction', () => {
+      service.getAllAchievements().subscribe();
+
+      const req = httpMock.expectOne(`${baseUrl}achievement`);
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
+    });
+
+    it('should include faction parameter when provided', () => {
+      service.getAllAchievements('alliance').subscribe();
+
+      const req = httpMock.expectOne(`${baseUrl}achievement?faction=alliance`);
+      expect(req.request.method).toBe('GET');
+      req.flush([]);
+    });
+  });
 });

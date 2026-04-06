@@ -10,9 +10,9 @@ import { PveApiService } from '../../services/pve-api.service';
 import { Achievement, CharacterAchievement } from '../../models/achievement';
 
 const mockAllAchs: Achievement[] = [
-  { ID: 1, Name: 'First Kill', Description: 'Kill a mob', Points: 10, icon: 'sword', Quantity: 0 },
-  { ID: 2, Name: 'Explorer', Description: 'Explore a zone', Points: 10, icon: 'map', Quantity: 0 },
-  { ID: 3, Name: 'Rich', Description: 'Earn 100g', Points: 5, icon: 'NULL', Quantity: 0 },
+  { ID: 1, Name: 'First Kill', Description: 'Kill a mob', Points: 10, icon: 'sword', Quantity: 0, category: 92 },
+  { ID: 2, Name: 'Explorer', Description: 'Explore a zone', Points: 10, icon: 'map', Quantity: 0, category: 92 },
+  { ID: 3, Name: 'Rich', Description: 'Earn 100g', Points: 5, icon: 'NULL', Quantity: 0, category: 92 },
 ];
 
 const mockCharAchs: CharacterAchievement[] = [

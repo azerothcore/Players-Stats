@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "PvE-ladder": {
+    "Players-Stats": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -63,10 +63,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "PvE-ladder:build:production"
+              "buildTarget": "Players-Stats:build:production"
             },
             "development": {
-              "buildTarget": "PvE-ladder:build:development"
+              "buildTarget": "Players-Stats:build:development"
             }
           },
           "defaultConfiguration": "development"

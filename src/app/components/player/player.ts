@@ -45,13 +45,29 @@ export class Player implements OnInit, OnDestroy {
     forkJoin({
       character: this.api.getCharacter(id),
       categories: this.api.getAchievementCategories(),
-    }).subscribe(({ character, categories }) => {
+      charAchs: this.api.getAllCharacterAchievements(id),
+      allAchs: this.api.getAllAchievements('alliance'),
+    }).subscribe(({ character, categories, charAchs, allAchs }) => {
+      const faction = getFaction(character.race);
       this.character.set(character);
-      this.faction.set(getFaction(character.race));
-      this.categoryTree.set(this.buildCategoryTree(categories));
+      this.faction.set(faction);
+      const summaryNode: CategoryNode = { id: -100, name: 'Summary', children: [] };
+      this.categoryTree.set([summaryNode, ...this.buildCategoryTree(categories)]);
 
-      // Auto-navigate to "General" (ID 92) like the original
-      this.selectCategory(92);
+      // Store data in context for summary
+      this.playerContext.allAchievements.set(allAchs);
+      this.playerContext.characterAchievements.set(charAchs);
+      this.playerContext.categories.set(categories);
+
+      // Compute total achievement points
+      const earnedSet = new Set(charAchs.map((a) => a.achievement));
+      const totalPoints = allAchs
+        .filter((a) => earnedSet.has(a.ID))
+        .reduce((sum, a) => sum + a.Points, 0);
+      this.playerContext.achievementPoints.set(totalPoints);
+
+      // Auto-navigate to Summary
+      this.selectCategory(-100);
     });
   }
 
@@ -87,7 +103,9 @@ export class Player implements OnInit, OnDestroy {
     const characterId = this.character()?.guid;
     if (!characterId) return;
 
-    if (STATS_CATEGORY_IDS.has(catId)) {
+    if (catId === -100) {
+      this.router.navigate(['summary'], { relativeTo: this.route });
+    } else if (STATS_CATEGORY_IDS.has(catId)) {
       this.router.navigate(['stats', catId], { relativeTo: this.route });
     } else {
       this.router.navigate(['ach', catId], { relativeTo: this.route });
@@ -97,6 +115,10 @@ export class Player implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.playerContext.character.set(null);
     this.playerContext.faction.set('alliance');
+    this.playerContext.achievementPoints.set(0);
+    this.playerContext.allAchievements.set([]);
+    this.playerContext.characterAchievements.set([]);
+    this.playerContext.categories.set([]);
   }
 
   toggleSidebar(): void {

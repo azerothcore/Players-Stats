@@ -1,0 +1,75 @@
+<div class="summary">
+  <!-- Recent Achievements -->
+  <section class="section">
+    <h3 class="section-title">Recent Achievements</h3>
+    <div class="recent-list">
+      @for (ach of recentAchievements(); track ach.id) {
+        <a
+          [href]="'https://wowgaming.altervista.org/aowow/?achievement=' + ach.id"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="recent-item"
+        >
+          <img
+            class="recent-icon"
+            [src]="'https://wow.zamimg.com/images/wow/icons/medium/' + ach.icon + '.jpg'"
+            [alt]="ach.name + ' icon'"
+            width="36"
+            height="36"
+            loading="lazy"
+          />
+          <div class="recent-info">
+            <span class="recent-name">{{ ach.name }}</span>
+            <span class="recent-date">{{ ach.date | date:'mediumDate' }}</span>
+          </div>
+          @if (ach.points > 0) {
+            <span class="recent-points">{{ ach.points }}</span>
+          }
+        </a>
+      }
+    </div>
+  </section>
+
+  <!-- Progress Overview -->
+  <section class="section">
+    <h3 class="section-title">Progress Overview</h3>
+
+    <!-- Total -->
+    <div class="progress-item total-progress">
+      <div class="progress-label">
+        <span>{{ totalProgress().name }}</span>
+        <span>{{ totalProgress().earned }} / {{ totalProgress().total }}</span>
+      </div>
+      <div
+        class="progress-bar"
+        role="progressbar"
+        [attr.aria-valuenow]="totalProgress().earned"
+        [attr.aria-valuemax]="totalProgress().total"
+        [attr.aria-label]="totalProgress().name"
+      >
+        <div class="progress-fill" [style.width.%]="totalProgress().percent"></div>
+      </div>
+    </div>
+
+    <!-- Categories (2 per row) -->
+    <div class="progress-grid">
+      @for (cat of categoryProgress(); track cat.name) {
+        <div class="progress-item">
+          <div class="progress-label">
+            <span>{{ cat.name }}</span>
+            <span>{{ cat.earned }} / {{ cat.total }}</span>
+          </div>
+          <div
+            class="progress-bar"
+            role="progressbar"
+            [attr.aria-valuenow]="cat.earned"
+            [attr.aria-valuemax]="cat.total"
+            [attr.aria-label]="cat.name"
+          >
+            <div class="progress-fill" [style.width.%]="cat.percent"></div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+</div>

@@ -11,9 +11,9 @@ import { Achievement, AchievementCategory, AchievementProgress } from '../../mod
 const mockCategory: AchievementCategory = { ID: 130, Name: 'Character', ParentID: -1 };
 
 const mockAchievements: Achievement[] = [
-  { ID: 1, Name: 'Deaths', Description: 'Total deaths', Points: 0, icon: 'skull', Quantity: 0 },
-  { ID: 2, Name: 'Quests Completed', Description: 'Total quests', Points: 0, icon: 'quest', Quantity: 100 },
-  { ID: 3, Name: 'No Progress', Description: 'Nothing yet', Points: 0, icon: 'NULL', Quantity: 0 },
+  { ID: 1, Name: 'Deaths', Description: 'Total deaths', Points: 0, icon: 'skull', Quantity: 0, category: 130 },
+  { ID: 2, Name: 'Quests Completed', Description: 'Total quests', Points: 0, icon: 'quest', Quantity: 100, category: 130 },
+  { ID: 3, Name: 'No Progress', Description: 'Nothing yet', Points: 0, icon: 'NULL', Quantity: 0, category: 130 },
 ];
 
 const mockProgress: AchievementProgress[] = [
@@ -22,9 +22,9 @@ const mockProgress: AchievementProgress[] = [
 ];
 
 const mockMoneyAchievements: Achievement[] = [
-  { ID: 328, Name: 'Total gold acquired', Description: 'Gold earned', Points: 0, icon: 'gold', Quantity: 0 },
-  { ID: 329, Name: 'Filtered out 1', Description: '', Points: 0, icon: '', Quantity: 0 },
-  { ID: 330, Name: 'Filtered out 2', Description: '', Points: 0, icon: '', Quantity: 0 },
+  { ID: 328, Name: 'Total gold acquired', Description: 'Gold earned', Points: 0, icon: 'gold', Quantity: 0, category: 140 },
+  { ID: 329, Name: 'Filtered out 1', Description: '', Points: 0, icon: '', Quantity: 0, category: 140 },
+  { ID: 330, Name: 'Filtered out 2', Description: '', Points: 0, icon: '', Quantity: 0, category: 140 },
 ];
 
 const mockMoneyProgress: AchievementProgress[] = [

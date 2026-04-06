@@ -12,4 +12,5 @@ export class PlayerHeader {
 
   readonly character = this.playerContext.character;
   readonly faction = this.playerContext.faction;
+  readonly achievementPoints = this.playerContext.achievementPoints;
 }

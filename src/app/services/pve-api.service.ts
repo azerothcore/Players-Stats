@@ -53,4 +53,19 @@ export class PveApiService {
       `${this.baseUrl}achievement_progress?guid=${characterId}&category=${categoryId}`
     );
   }
+
+  /** Get all earned achievements for a character (across all categories) */
+  getAllCharacterAchievements(characterId: number): Observable<CharacterAchievement[]> {
+    return this.http.get<CharacterAchievement[]>(
+      `${this.baseUrl}character_achievement/${characterId}`
+    );
+  }
+
+  /** Get all achievements (no category filter), optionally filtered by faction */
+  getAllAchievements(faction?: string): Observable<Achievement[]> {
+    const factionParam = faction ? `?faction=${faction}` : '';
+    return this.http.get<Achievement[]>(
+      `${this.baseUrl}achievement${factionParam}`
+    );
+  }
 }

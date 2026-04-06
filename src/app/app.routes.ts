@@ -10,6 +10,11 @@ export const routes: Routes = [
     loadComponent: () => import('./components/player/player').then((m) => m.Player),
     children: [
       {
+        path: 'summary',
+        loadComponent: () =>
+          import('./components/achievements/summary/summary-page').then((m) => m.SummaryPage),
+      },
+      {
         path: 'ach/:catId',
         loadComponent: () =>
           import('./components/achievements/achievements').then((m) => m.Achievements),
