@@ -6,23 +6,17 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { Character, Faction, getFaction } from '../../models/character';
 import { AchievementCategory, STATS_CATEGORY_IDS } from '../../models/achievement';
 import { PveApiService } from '../../services/pve-api.service';
-
-interface CategoryNode {
-  id: number;
-  name: string;
-  children: CategoryNode[];
-}
+import { CategoryNav, CategoryNode } from './category-nav/category-nav';
 
 @Component({
   selector: 'app-player',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, NgTemplateOutlet],
+  imports: [RouterOutlet, CategoryNav],
   templateUrl: './player.html',
   styleUrl: './player.css',
 })
@@ -35,8 +29,6 @@ export class Player implements OnInit {
   readonly faction = signal<Faction>('alliance');
   readonly categoryTree = signal<CategoryNode[]>([]);
   readonly currentCategoryId = signal<number | null>(null);
-  readonly expandedParents = signal<Set<number>>(new Set());
-  readonly expandedStatistics = signal<Set<number>>(new Set());
   readonly sidebarOpen = signal(false);
 
   readonly characterId = computed(() => {
@@ -81,63 +73,13 @@ export class Player implements OnInit {
     }));
   }
 
-  toggleParent(parent: CategoryNode): void {
-    // If the parent has no children, navigate directly (e.g., "General", "Feats of Strength")
-    if (parent.children.length === 0) {
-      this.selectCategory(parent.id);
-      // Collapse any expanded parent
-      this.expandedParents.set(new Set());
-      return;
-    }
-
-    // Otherwise, expand/collapse the parent and navigate to its achievements
-    const isExpanded = this.expandedParents().has(parent.id);
-    this.expandedParents.update((set) => {
-      const next = new Set(set);
-      if (isExpanded) {
-        next.delete(parent.id);
-      } else {
-        next.clear();
-        next.add(parent.id);
-      }
-      return next;
-    });
-
-    if (!isExpanded) {
-      this.selectCategory(parent.id, false);
-    }
+  onCategorySelected(catId: number): void {
+    this.selectCategory(catId);
   }
 
-  isParentExpanded(parentId: number): boolean {
-    return this.expandedParents().has(parentId);
-  }
-
-  toggleStatistic(catId: number): void {
-    const isExpanded = this.expandedStatistics().has(catId);
-    this.expandedStatistics.update((set) => {
-      const next = new Set(set);
-      if (isExpanded) {
-        next.delete(catId);
-      } else {
-        next.add(catId);
-      }
-      return next;
-    });
-
-    if (!isExpanded) {
-      this.selectCategory(catId, false);
-    }
-  }
-
-  isStatisticExpanded(catId: number): boolean {
-    return this.expandedStatistics().has(catId);
-  }
-
-  selectCategory(catId: number, closeSidebar = true): void {
+  selectCategory(catId: number): void {
     this.currentCategoryId.set(catId);
-    if (closeSidebar) {
-      this.sidebarOpen.set(false);
-    }
+    this.sidebarOpen.set(false);
 
     const characterId = this.character()?.guid;
     if (!characterId) return;
@@ -147,10 +89,6 @@ export class Player implements OnInit {
     } else {
       this.router.navigate(['ach', catId], { relativeTo: this.route });
     }
-  }
-
-  isStatCategory(catId: number): boolean {
-    return STATS_CATEGORY_IDS.has(catId);
   }
 
   toggleSidebar(): void {

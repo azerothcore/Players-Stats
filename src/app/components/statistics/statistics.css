@@ -1,5 +1,11 @@
 .stats-container {
-  max-width: 540px;
+  max-width: 560px;
+}
+
+.achievement-list-container {
+  max-width: 560px;
+  max-height: 530px;
+  overflow-y: auto;
 }
 
 .stat-card {

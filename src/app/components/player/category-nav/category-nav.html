@@ -1,0 +1,56 @@
+@for (parent of categoryTree(); track parent.id) {
+  <div class="mb-1">
+    <button
+      class="category w-full text-left"
+      [class.selected]="isParentExpanded(parent.id) || currentCategoryId() === parent.id"
+      (click)="toggleParent(parent)"
+      [attr.aria-expanded]="isParentExpanded(parent.id)"
+      [attr.aria-controls]="'children-' + parent.id"
+    >
+      {{ parent.name }}
+    </button>
+
+    @if (isParentExpanded(parent.id)) {
+      <div [id]="'children-' + parent.id" role="group" [attr.aria-label]="parent.name + ' subcategories'">
+        @for (child of parent.children; track child.id) {
+          @if (child.children.length > 0) {
+            <!-- Category with sub-children (e.g., Statistics) -->
+            <button
+              class="sub-category w-full text-left"
+              [class.statistic]="isStatCategory(child.id)"
+              [class.selected]="currentCategoryId() === child.id"
+              (click)="toggleStatistic(child.id)"
+              [attr.aria-expanded]="isStatisticExpanded(child.id)"
+            >
+              {{ child.name }}
+            </button>
+
+            @if (isStatisticExpanded(child.id)) {
+              <div role="group" [attr.aria-label]="child.name + ' subcategories'">
+                @for (sub of child.children; track sub.id) {
+                  <button
+                    class="sub-statistic w-full text-left"
+                    [class.selected]="currentCategoryId() === sub.id"
+                    (click)="selectCategory(sub.id)"
+                  >
+                    {{ sub.name }}
+                  </button>
+                }
+              </div>
+            }
+          } @else {
+            <!-- Leaf category -->
+            <button
+              class="sub-category w-full text-left"
+              [class.statistic]="isStatCategory(child.id)"
+              [class.selected]="currentCategoryId() === child.id"
+              (click)="selectCategory(child.id)"
+            >
+              {{ child.name }}
+            </button>
+          }
+        }
+      </div>
+    }
+  </div>
+}

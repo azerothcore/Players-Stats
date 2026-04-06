@@ -3,9 +3,11 @@ import {
   Component,
   computed,
   DestroyRef,
+  ElementRef,
   inject,
   OnInit,
   signal,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
@@ -25,57 +27,15 @@ interface AchievementView extends Achievement {
   selector: 'app-achievements',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [],
-  template: `
-    <div class="achievement-container mx-auto">
-      <fieldset class="filter-bar" role="radiogroup" aria-label="Filter achievements">
-        @for (option of filterOptions; track option.value) {
-          <button
-            class="filter-btn"
-            [class.active]="filter() === option.value"
-            [attr.aria-pressed]="filter() === option.value"
-            (click)="filter.set(option.value)"
-          >
-            {{ option.label }}
-          </button>
-        }
-      </fieldset>
-
-      @for (ach of filteredAchievements(); track ach.ID) {
-        <a
-          [href]="'https://wowgaming.altervista.org/aowow/?achievement=' + ach.ID"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="achievement-link"
-        >
-          <div class="achievement" [class.completed]="ach.completed" role="listitem">
-            <img
-              class="achievement-icon"
-              [src]="'https://wow.zamimg.com/images/wow/icons/large/' + ach.icon + '.jpg'"
-              [alt]="ach.Name + ' icon'"
-              width="50"
-              height="50"
-              loading="lazy"
-            />
-            <div class="achievement-content">
-              <span class="achievement-name">{{ ach.Name }}</span>
-              <span class="achievement-description">{{ ach.Description }}</span>
-            </div>
-            <div class="achievement-right">
-              <span class="achievement-points" [class.achievement-points-0]="ach.Points === 0">{{
-                ach.Points
-              }}</span>
-            </div>
-          </div>
-        </a>
-      }
-    </div>
-  `,
+  templateUrl: './achievements.html',
   styleUrl: './achievements.css',
 })
 export class Achievements implements OnInit {
   private readonly api = inject(PveApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+
+  private readonly listContainer = viewChild<ElementRef<HTMLElement>>('listContainer');
 
   readonly achievements = signal<AchievementView[]>([]);
   readonly filter = signal<AchievementFilter>('all');
@@ -123,6 +83,10 @@ export class Achievements implements OnInit {
         });
 
         this.achievements.set(views);
+        const container = this.listContainer()?.nativeElement;
+        if (container) {
+          container.scrollTop = 0;
+        }
 
         // Trigger wowgaming tooltip rescan for new achievement links
         setTimeout(() => {

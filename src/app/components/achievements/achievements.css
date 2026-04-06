@@ -1,5 +1,10 @@
 .achievement-container {
-  max-width: 540px;
+  max-width: 560px;
+}
+.achievement-list-container {
+  max-width: 560px;
+  max-height: 530px;
+  overflow-y: auto;
 }
 
 .filter-bar {
@@ -19,7 +24,9 @@
   color: #ccc;
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .filter-btn:hover {

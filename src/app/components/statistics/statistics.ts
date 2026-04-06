@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   inject,
   OnInit,
   signal,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
@@ -30,46 +32,7 @@ interface StatView {
 @Component({
   selector: 'app-statistics',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    @if (category(); as cat) {
-      <h2 class="mb-4 text-xl font-bold text-wow-gold">{{ cat.Name }}</h2>
-    }
-
-    <div class="stats-container mx-auto" role="list" aria-label="Statistics">
-      @for (stat of stats(); track stat.id) {
-        <div
-          class="stat-card"
-          [class.completed]="stat.completed"
-          role="listitem"
-        >
-          <div class="stat-content">
-            <span class="stat-name">{{ stat.name }}</span>
-
-            @if (stat.counterHtml) {
-              <span class="stat-counter" [innerHTML]="stat.counterHtml"></span>
-            } @else if (stat.hasProgress) {
-              <div class="progress-wrapper" role="progressbar"
-                [attr.aria-valuenow]="stat.counterNum"
-                [attr.aria-valuemin]="0"
-                [attr.aria-valuemax]="stat.quantity"
-                [attr.aria-label]="stat.name + ' progress'"
-              >
-                <div class="progress-track">
-                  <div
-                    class="progress-fill"
-                    [style.width.%]="stat.progressPercent"
-                  ></div>
-                  <span class="progress-text">{{ stat.counterNum }} / {{ stat.quantity }}</span>
-                </div>
-              </div>
-            } @else {
-              <span class="stat-counter">{{ stat.counter }}</span>
-            }
-          </div>
-        </div>
-      }
-    </div>
-  `,
+  templateUrl: './statistics.html',
   styleUrl: './statistics.css',
 })
 export class Statistics implements OnInit {
@@ -77,6 +40,8 @@ export class Statistics implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly destroyRef = inject(DestroyRef);
+
+  private readonly listContainer = viewChild<ElementRef<HTMLElement>>('listContainer');
 
   readonly category = signal<AchievementCategory | null>(null);
   readonly stats = signal<StatView[]>([]);
@@ -111,6 +76,11 @@ export class Statistics implements OnInit {
           .map((ach) => this.buildStatView(ach, progressMap, statsId));
 
         this.stats.set(views);
+
+        const container = this.listContainer()?.nativeElement;
+        if (container) {
+          container.scrollTop = 0;
+        }
       });
   }
 
