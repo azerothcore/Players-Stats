@@ -2,12 +2,16 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  DestroyRef,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { CharacterRank, getFaction } from '../../models/character';
 import { PveApiService } from '../../services/pve-api.service';
 
@@ -21,8 +25,10 @@ import { PveApiService } from '../../services/pve-api.service';
 export class Home implements OnInit {
   private readonly api = inject(PveApiService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly pageSize = 10;
+  private readonly searchSubject = new Subject<string>();
 
   readonly ranks = signal<CharacterRank[]>([]);
   readonly searchQuery = signal('');
@@ -44,15 +50,26 @@ export class Home implements OnInit {
     return pages;
   });
 
-  readonly filteredRanks = computed(() => {
-    const query = this.searchQuery().toLowerCase();
-    const allRanks = this.ranks();
-    if (!query) return allRanks;
-    return allRanks.filter((r) => r.name.toLowerCase().includes(query));
-  });
-
   ngOnInit(): void {
+    this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((query) =>
+          this.api.getCharacterAchievements(1, this.pageSize, query || undefined)
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((res) => {
+        this.applyResponse(res);
+      });
+
     this.loadPage(1);
+  }
+
+  onSearchChange(query: string): void {
+    this.searchQuery.set(query);
+    this.searchSubject.next(query);
   }
 
   goToPage(page: number): void {
@@ -61,15 +78,20 @@ export class Home implements OnInit {
   }
 
   private loadPage(page: number): void {
-    this.api.getCharacterAchievements(page, this.pageSize).subscribe((res) => {
-      const ranked = res.data.map((r) => ({
-        ...r,
-        faction: getFaction(r.race),
-      }));
-      this.ranks.set(ranked);
-      this.currentPage.set(res.page);
-      this.totalItems.set(res.total);
+    const name = this.searchQuery() || undefined;
+    this.api.getCharacterAchievements(page, this.pageSize, name).subscribe((res) => {
+      this.applyResponse(res);
     });
+  }
+
+  private applyResponse(res: { data: CharacterRank[]; page: number; total: number }): void {
+    const ranked = res.data.map((r) => ({
+      ...r,
+      faction: getFaction(r.race),
+    }));
+    this.ranks.set(ranked);
+    this.currentPage.set(res.page);
+    this.totalItems.set(res.total);
   }
 
   showPlayerStats(guid: number): void {

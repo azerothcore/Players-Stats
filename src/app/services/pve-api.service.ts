@@ -10,10 +10,11 @@ export class PveApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = environment.apiUrl + 'characters/';
 
-  /** Get characters ranked by achievement points (paginated) */
-  getCharacterAchievements(page = 1, limit = 25): Observable<PaginatedResponse<CharacterRank>> {
+  /** Get characters ranked by achievement points (paginated, optionally filtered by name) */
+  getCharacterAchievements(page = 1, limit = 25, name?: string): Observable<PaginatedResponse<CharacterRank>> {
+    const nameParam = name ? `&name=${encodeURIComponent(name)}` : '';
     return this.http.get<PaginatedResponse<CharacterRank>>(
-      `${this.baseUrl}character_achievement?page=${page}&limit=${limit}`
+      `${this.baseUrl}character_achievement?page=${page}&limit=${limit}${nameParam}`
     );
   }
 

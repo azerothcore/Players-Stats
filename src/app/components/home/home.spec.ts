@@ -54,7 +54,7 @@ describe('Home', () => {
     it('should load first page of rankings', () => {
       component.ngOnInit();
 
-      expect(mockApi['getCharacterAchievements']).toHaveBeenCalledWith(1, 10);
+      expect(mockApi['getCharacterAchievements']).toHaveBeenCalledWith(1, 10, undefined);
       expect(component.ranks().length).toBe(3);
       expect(component.currentPage()).toBe(1);
       expect(component.totalItems()).toBe(30);
@@ -80,32 +80,42 @@ describe('Home', () => {
     });
   });
 
-  describe('filteredRanks', () => {
+  describe('onSearchChange', () => {
     beforeEach(() => {
       component.ngOnInit();
     });
 
-    it('should return all ranks when search is empty', () => {
-      expect(component.filteredRanks().length).toBe(3);
+    it('should update searchQuery signal', () => {
+      component.onSearchChange('alpha');
+      expect(component.searchQuery()).toBe('alpha');
     });
 
-    it('should filter ranks by name (case-insensitive)', () => {
-      component.searchQuery.set('alpha');
-      expect(component.filteredRanks().length).toBe(1);
-      expect(component.filteredRanks()[0].name).toBe('Alpha');
+    it('should call API with name after debounce', async () => {
+      const filtered: PaginatedResponse<CharacterRank> = {
+        data: [mockRanks[0]],
+        total: 1,
+        page: 1,
+        limit: 10,
+      };
+      mockApi['getCharacterAchievements'].mockReturnValue(of(filtered));
+
+      component.onSearchChange('alpha');
+
+      await new Promise((r) => setTimeout(r, 350));
+
+      expect(mockApi['getCharacterAchievements']).toHaveBeenCalledWith(1, 10, 'alpha');
+      expect(component.ranks().length).toBe(1);
+      expect(component.totalItems()).toBe(1);
     });
 
-    it('should return empty when no match', () => {
-      component.searchQuery.set('zzz');
-      expect(component.filteredRanks().length).toBe(0);
-    });
+    it('should call API without name when search is cleared', async () => {
+      mockApi['getCharacterAchievements'].mockReturnValue(of(mockResponse));
 
-    it('should match partial names', () => {
-      component.searchQuery.set('a');
-      const names = component.filteredRanks().map((r) => r.name);
-      expect(names).toContain('Alpha');
-      expect(names).toContain('Bravo');
-      expect(names).toContain('Charlie');
+      component.onSearchChange('');
+
+      await new Promise((r) => setTimeout(r, 350));
+
+      expect(mockApi['getCharacterAchievements']).toHaveBeenCalledWith(1, 10, undefined);
     });
   });
 
@@ -120,8 +130,18 @@ describe('Home', () => {
       );
 
       component.goToPage(2);
-      expect(mockApi['getCharacterAchievements']).toHaveBeenCalledWith(2, 10);
+      expect(mockApi['getCharacterAchievements']).toHaveBeenCalledWith(2, 10, undefined);
       expect(component.currentPage()).toBe(2);
+    });
+
+    it('should pass search query when navigating pages', () => {
+      component.searchQuery.set('test');
+      mockApi['getCharacterAchievements'].mockReturnValue(
+        of({ ...mockResponse, page: 2 }),
+      );
+
+      component.goToPage(2);
+      expect(mockApi['getCharacterAchievements']).toHaveBeenCalledWith(2, 10, 'test');
     });
 
     it('should not load page below 1', () => {

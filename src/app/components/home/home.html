@@ -6,7 +6,7 @@
       type="text"
       placeholder="Search character..."
       [ngModel]="searchQuery()"
-      (ngModelChange)="searchQuery.set($event)"
+      (ngModelChange)="onSearchChange($event)"
       class="w-full rounded border-2 border-[#333] bg-[#222] px-4 py-2 font-bold text-[#555] placeholder-[#555] transition-colors duration-300 focus:border-[#999] focus:bg-white focus:text-[#111] focus:outline-none"
       aria-label="Search characters by name"
     />
@@ -27,7 +27,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (rank of filteredRanks(); track rank.guid; let i = $index) {
+        @for (rank of ranks(); track rank.guid; let i = $index) {
           <tr
             class="rank-row"
             [class.row-odd]="i % 2 === 0"
